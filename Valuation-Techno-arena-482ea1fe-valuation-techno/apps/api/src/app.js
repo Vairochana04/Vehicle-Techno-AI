@@ -15,7 +15,16 @@ import analyticsRoutes from './routes/analytics.js';
 
 seed();
 const app = express();
-app.use((req, res, next) => { res.setHeader('X-Content-Type-Options', 'nosniff'); res.setHeader('X-Frame-Options', 'SAMEORIGIN'); res.setHeader('Referrer-Policy', 'no-referrer'); next(); });
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  // Framing policy is env-driven: hosted/preview environments embed the portal in a
+  // cross-origin iframe (SAMEORIGIN would break it). Set FRAME_OPTIONS=SAMEORIGIN
+  // (or DENY) on a production deployment that must not be embedded.
+  const frameOptions = process.env.FRAME_OPTIONS || 'ALLOWALL';
+  if (frameOptions !== 'ALLOWALL') res.setHeader('X-Frame-Options', frameOptions);
+  next();
+});
 app.use(cors({ origin: process.env.CORS_ORIGIN || true })); app.use(express.json({ limit: '5mb' }));
 app.use('/uploads', express.static(config.uploadDir));
 app.get('/api/health', (req, res) => res.json({ ok: true, service: 'Valuation Techno API', time: new Date().toISOString() }));

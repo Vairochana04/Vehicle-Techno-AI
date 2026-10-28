@@ -9,6 +9,7 @@
     "build": "npm run build --workspace=apps/web",
     "prestart": "npm run build",
     "start": "node apps/api/src/index.js",
-    "test": "npm run test --workspace=apps/api"
+    "test": "npm run test --workspace=apps/api",
+    "preview": "bash scripts/preview.sh"
   }
 }
